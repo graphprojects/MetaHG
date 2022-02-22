@@ -150,7 +150,7 @@ if __name__ == '__main__':
                         help='post feature vector')
     parser.add_argument('--keywordvectorpath', type=str, default='./data/keywordid_merged_vector_add.txt',
                         help='keyword feature vector')
-    parser.add_argument('--relatiopath', type=str, default='./data/user_post_similar_0.98_add.txt',
+    parser.add_argument('--relatiopath', type=str, default='./data/relation.txt',
                         help='relation file')
     parser.add_argument('--usertypepath', type=str, default='./data/userid_categ_add.json',
                         help='user type file')
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     parser.add_argument('--hidden', type=int, help='Number of hidden units', default=16)
     parser.add_argument('--kd', type=int, default=1, help='Use knowledge distillation')
     parser.add_argument('--temp', type=float, default=10.0, help='temperature index in knowledge distillation')
-    parser.add_argument('--ldakd', type=float, default=0.01, help='temperature index in knowledge distillation')
+    parser.add_argument('--ldakd', type=float, default=0.01, help='trade-off value for knowledge distillation')
     parser.add_argument('--normalization', type=str, default='AugNormAdj',
                         help='Normalization method for the adjacency matrix.')
     parser.add_argument('--metaseed', type=int, default=3, help='Random seed.')
