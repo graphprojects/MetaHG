@@ -6,7 +6,7 @@ from representationlearning.rgcn_model import RGCN
 from representationlearning.ssl import SSL
 from representationlearning.bg_gsr import StructureLearning, build_relation, build_graph
 from metalearning.meta import *
-
+from utils import *
 
 
 def main(args):
