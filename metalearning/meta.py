@@ -17,7 +17,7 @@ class Meta(nn.Module):
         self.n_way = args.n_way
         self.k_spt = args.k_spt
         self.k_qry = args.k_qry
-        self.task_num = args.batch_num
+        self.batch_num = args.batch_num
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
         self.embed_dim = args.out_dim
@@ -49,7 +49,7 @@ class Meta(nn.Module):
 
 
     def forward(self, x_spt, y_spt, x_qry, y_qry):
-        task_num = self.task_num
+       
         querysz = y_qry[0].shape[0]
 
         losses_q = [0 for _ in range(self.update_step + 1)]
@@ -59,7 +59,7 @@ class Meta(nn.Module):
         precs = [0 for _ in range(self.update_step + 1)]
         corrects = [0 for _ in range(self.update_step + 1)]
 
-        for i in range(task_num):
+        for i in range(self.batch_num):
 
             x_spt[i] = x_spt[i]
             y_spt[i] = y_spt[i]
