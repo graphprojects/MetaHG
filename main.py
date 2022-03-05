@@ -105,10 +105,10 @@ def main(args):
                 with torch.no_grad():
                     teacher_score = [maml_copy.predict(item) for item in x_qry_test]   # teacher logit scores
 
-                f1, acc2 = model_meta_trained.forward_kd(
+                test_f1, test_acc = model_meta_trained.forward_kd(
                     x_spt_test, y_spt_test, x_qry_test, y_qry_test, teacher_score, kd=args.kd,temp=args.temp,alpha=args.ldakd)   # meta-testing
 
-            print("{} epoch: |test_F1: {:.4f} |test_accuracy: {:.4f}".format(g_epoch,f1[-1] ,acc2[-1]))
+            print("{} epoch: |test_F1: {:.4f} |test_accuracy: {:.4f}".format(g_epoch,test_f1[-1] ,test_acc[-1]))
 
 
 
