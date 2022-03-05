@@ -71,13 +71,10 @@ def main(args):
             meta_train_f1 = []
 
             for train_task in args.metatrainlabel:
-
-                for j in range(args.metatrainepoch):
-
-                    x_spt_train, y_spt_train, x_qry_train, y_qry_train = get_metatrain_data(meta_trainfeat, meta_trainlabel, train_task, args.k_spt,
+ 
+                   x_spt_train, y_spt_train, x_qry_train, y_qry_train = get_metatrain_data(meta_trainfeat, meta_trainlabel, train_task, args.k_spt,
                                                                 args.k_qry, args.batch_num)     # get mete-training  data
-
-                    loss_meta, accs, f1 = maml.forward(x_spt_train, y_spt_train, x_qry_train, y_qry_train)   # mete-training
+                   loss_meta, accs, f1 = maml.forward(x_spt_train, y_spt_train, x_qry_train, y_qry_train)   # mete-training
 
                 meta_train_acc.append(accs[-1])
                 meta_train_f1.append(f1[-1])
@@ -171,7 +168,6 @@ if __name__ == '__main__':
                         help="number of filter weight matrices, default: -1 [use all]")
 
     ################ meta-learning#####################
-    parser.add_argument('--metatrainepoch', type=int, help='train epoch for meta learning', default=20)
     parser.add_argument('--n_way', type=int, help='number of classification', default=2)
     parser.add_argument('--meta_lr', type=float, help='meta-level outer learning rate', default=0.05)
     parser.add_argument('--update_lr', type=float, help='task-level inner update learning rate', default=0.08)
