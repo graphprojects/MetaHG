@@ -14,9 +14,6 @@ class Meta(nn.Module):
 
         self.update_lr = args.update_lr
         self.meta_lr = args.meta_lr
-        self.n_way = args.n_way
-        self.k_spt = args.k_spt
-        self.k_qry = args.k_qry
         self.batch_num = args.batch_num
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
@@ -26,6 +23,7 @@ class Meta(nn.Module):
             ('relu', [args.hidden, self.embed_dim]),
             ('linear', [args.n_way, args.hidden])
         ]
+
         self.net = Learner(self.config)
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
@@ -49,7 +47,7 @@ class Meta(nn.Module):
 
 
     def forward(self, x_spt, y_spt, x_qry, y_qry):
-       
+
         querysz = y_qry[0].shape[0]
 
         losses_q = [0 for _ in range(self.update_step + 1)]
@@ -60,11 +58,6 @@ class Meta(nn.Module):
         corrects = [0 for _ in range(self.update_step + 1)]
 
         for i in range(self.batch_num):
-
-            x_spt[i] = x_spt[i]
-            y_spt[i] = y_spt[i]
-            x_qry[i] = x_qry[i]
-            y_qry[i] = y_qry[i]
 
             logits = self.net(x_spt[i], vars=None, bn_training=True)
             loss = F.cross_entropy(logits, y_spt[i].squeeze())
@@ -123,32 +116,26 @@ class Meta(nn.Module):
                     precs[k+1] = precs[k+1] + prec_sub
 
 
-        loss_q = losses_q[-1] / task_num
+        loss_q = losses_q[-1] / self.batch_num
 
-        acc = np.array(corrects) / (querysz * task_num)
+        acc = np.array(corrects) / (querysz * self.batch_num)
 
-        f1 = np.array(f1s) / (task_num)
+        f1 = np.array(f1s) / (self.batch_num)
 
         return loss_q, acc, f1
 
 
     def forward_kd(self, x_spt, y_spt, x_qry, y_qry,teacher_score,kd,temp,alpha):
-        task_num = self.task_num
 
+        losses_q = [0 for _ in range(self.update_step_test + 1)]
+        f1s = [0 for _ in range(self.update_step_test + 1)]
+        accs = [0 for _ in range(self.update_step_test + 1)]
+        recalls = [0 for _ in range(self.update_step_test + 1)]
+        precs = [0 for _ in range(self.update_step_test + 1)]
+        corrects = [0 for _ in range(self.update_step_test + 1)]
 
-        losses_q = [0 for _ in range(self.update_step + 1)]
-        f1s = [0 for _ in range(self.update_step + 1)]
-        accs = [0 for _ in range(self.update_step + 1)]
-        recalls = [0 for _ in range(self.update_step + 1)]
-        precs = [0 for _ in range(self.update_step + 1)]
-        corrects = [0 for _ in range(self.update_step + 1)]
+        for i in range(self.batch_num):
 
-        for i in range(task_num):
-
-            x_spt[i] = x_spt[i]
-            y_spt[i] = y_spt[i]
-            x_qry[i] = x_qry[i]
-            y_qry[i] = y_qry[i]
             logits_meta_train = self.net(x_spt[i], vars=None, bn_training=True)
 
             with torch.no_grad():
@@ -228,18 +215,16 @@ class Meta(nn.Module):
                     recalls[k + 1] = recalls[k + 1] + recall_sub
                     precs[k + 1] = precs[k + 1] + prec_sub
 
-        f1 = np.array(f1s) / (task_num)
-        acc = np.array(accs) / (task_num)
+        f1 = np.array(f1s) / (self.batch_num)
+        acc = np.array(accs) / (self.batch_num)
 
         return f1, acc
 
 
     def predict(self, x_qry):
 
-        task_num = self.task_num
-
         with torch.no_grad():
-            for i in range(task_num):
+            for i in range(self.batch_num):
                 logits = self.net(x_qry, vars=self.net.parameters(), bn_training=True)
                 teacher_score = F.softmax(logits, dim=-1)
 
